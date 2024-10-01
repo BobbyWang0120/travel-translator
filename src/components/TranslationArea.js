@@ -1,11 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { TextField, IconButton, Box } from '@mui/material';
-import { Mic, VolumeUp } from '@mui/icons-material';
-import { translateText, textToSpeech, speechToText } from '../services/openai';
+import { Mic, Stop, VolumeUp } from '@mui/icons-material';
+import {
+  translateText,
+  transcribeAudio,
+  textToSpeech,
+} from '../services/openai';
 
 function TranslationArea({ isSource, sourceLang, targetLang }) {
   const [text, setText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
   useEffect(() => {
     if (!isSource && text) {
@@ -13,13 +20,45 @@ function TranslationArea({ isSource, sourceLang, targetLang }) {
     }
   }, [isSource, text, sourceLang, targetLang]);
 
-  const handleSpeechToText = async () => {
-    const audioBlob = await recordAudio();
-    const result = await speechToText(
-      audioBlob,
-      isSource ? sourceLang : targetLang
-    );
-    setText(result);
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error accessing the microphone', error);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: 'audio/mp3',
+        });
+
+        const transcription = await transcribeAudio(audioBlob);
+        setText(transcription);
+      };
+    }
+  };
+
+  const handleSpeechToText = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
   };
 
   const handleTextToSpeech = () => {
@@ -34,7 +73,7 @@ function TranslationArea({ isSource, sourceLang, targetLang }) {
       <TextField
         fullWidth
         multiline
-        rows={6}
+        rows={4}
         value={isSource ? text : translatedText}
         onChange={(e) => isSource && setText(e.target.value)}
         placeholder={isSource ? '输入要翻译的文本' : '翻译结果'}
@@ -46,7 +85,7 @@ function TranslationArea({ isSource, sourceLang, targetLang }) {
       />
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <IconButton onClick={handleSpeechToText} color='primary'>
-          <Mic />
+          {isRecording ? <Stop /> : <Mic />}
         </IconButton>
         <IconButton onClick={handleTextToSpeech} color='secondary'>
           <VolumeUp />
@@ -57,9 +96,3 @@ function TranslationArea({ isSource, sourceLang, targetLang }) {
 }
 
 export default TranslationArea;
-
-// 模拟录音功能，实际应用中需要使用 Web Audio API
-async function recordAudio() {
-  console.log('Recording audio...');
-  return new Blob(); // 返回一个空的 Blob 对象
-}
