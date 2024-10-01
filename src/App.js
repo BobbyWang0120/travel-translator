@@ -1,18 +1,28 @@
 import React, { useState } from 'react';
 import {
-  Container,
-  Grid,
-  Paper,
-  Typography,
-  CssBaseline,
   ThemeProvider,
   createTheme,
+  CssBaseline,
+  Box,
+  Divider,
 } from '@mui/material';
 import LanguageSelector from './components/LanguageSelector';
 import TranslationArea from './components/TranslationArea';
-import './App.css';
 
-const theme = createTheme();
+const theme = createTheme({
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          overflow: 'hidden',
+          position: 'fixed',
+          width: '100%',
+          height: '100%',
+        },
+      },
+    },
+  },
+});
 
 function App() {
   const [sourceLang, setSourceLang] = useState('zh');
@@ -21,41 +31,39 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth='sm'>
-        <Typography variant='h4' align='center' gutterBottom>
-          旅行翻译器
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <Paper elevation={3}>
-              <LanguageSelector
-                label='源语言'
-                value={sourceLang}
-                onChange={setSourceLang}
-              />
-              <TranslationArea
-                isSource={true}
-                sourceLang={sourceLang}
-                targetLang={targetLang}
-              />
-            </Paper>
-          </Grid>
-          <Grid item xs={6}>
-            <Paper elevation={3}>
-              <LanguageSelector
-                label='目标语言'
-                value={targetLang}
-                onChange={setTargetLang}
-              />
-              <TranslationArea
-                isSource={false}
-                sourceLang={sourceLang}
-                targetLang={targetLang}
-              />
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
+      <Box
+        sx={{
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column-reverse',
+            transform: 'rotate(180deg)',
+          }}
+        >
+          <TranslationArea
+            isSource={false}
+            sourceLang={sourceLang}
+            targetLang={targetLang}
+          />
+          <LanguageSelector value={targetLang} onChange={setTargetLang} />
+        </Box>
+        <Divider />
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <LanguageSelector value={sourceLang} onChange={setSourceLang} />
+          <TranslationArea
+            isSource={true}
+            sourceLang={sourceLang}
+            targetLang={targetLang}
+          />
+        </Box>
+      </Box>
     </ThemeProvider>
   );
 }

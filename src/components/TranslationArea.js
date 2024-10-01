@@ -14,7 +14,6 @@ function TranslationArea({ isSource, sourceLang, targetLang }) {
   }, [isSource, text, sourceLang, targetLang]);
 
   const handleSpeechToText = async () => {
-    // 这里需要实现录音功能
     const audioBlob = await recordAudio();
     const result = await speechToText(
       audioBlob,
@@ -31,23 +30,25 @@ function TranslationArea({ isSource, sourceLang, targetLang }) {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: 2 }}>
       <TextField
         fullWidth
         multiline
-        rows={4}
+        rows={6}
         value={isSource ? text : translatedText}
         onChange={(e) => isSource && setText(e.target.value)}
         placeholder={isSource ? '输入要翻译的文本' : '翻译结果'}
         InputProps={{
           readOnly: !isSource,
         }}
+        variant='outlined'
+        sx={{ flex: 1, mb: 1 }}
       />
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-        <IconButton onClick={handleSpeechToText}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <IconButton onClick={handleSpeechToText} color='primary'>
           <Mic />
         </IconButton>
-        <IconButton onClick={handleTextToSpeech}>
+        <IconButton onClick={handleTextToSpeech} color='secondary'>
           <VolumeUp />
         </IconButton>
       </Box>

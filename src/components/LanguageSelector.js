@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { FormControl, Select, MenuItem, Box } from '@mui/material';
 
 const languages = [
   { code: 'zh', name: '中文' },
@@ -10,23 +10,19 @@ const languages = [
   { code: 'de', name: '德语' },
 ];
 
-function LanguageSelector({ label, value, onChange }) {
+function LanguageSelector({ value, onChange }) {
   return (
-    <FormControl fullWidth>
-      <InputLabel id={`${label}-label`}>{label}</InputLabel>
-      <Select
-        labelId={`${label}-label`}
-        value={value}
-        label={label}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        {languages.map((lang) => (
-          <MenuItem key={lang.code} value={lang.code}>
-            {lang.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <Box sx={{ p: 2 }}>
+      <FormControl fullWidth size='small'>
+        <Select value={value} onChange={(e) => onChange(e.target.value)}>
+          {languages.map((lang) => (
+            <MenuItem key={lang.code} value={lang.code}>
+              {lang.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
   );
 }
 
