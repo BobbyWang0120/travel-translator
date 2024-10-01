@@ -46,7 +46,7 @@ function TranslationArea({ isSource, sourceLang, targetLang }) {
         const audioBlob = new Blob(audioChunksRef.current, {
           type: 'audio/mp3',
         });
-
+        console.log('Audio blob type:', audioBlob.type);
         const transcription = await transcribeAudio(audioBlob);
         setText(transcription);
       };
