@@ -61,19 +61,24 @@ function TranslationArea({ isSource }) {
         multiline
         rows={4}
         value={isSource ? sourceText : translatedText}
-        placeholder={isSource ? '输入要翻译的文本' : '翻译结果'}
+        placeholder={isSource ? '输入要翻译的文本' : 'Translated text'}
         InputProps={{
           readOnly: true,
+          style: { fontSize: '1.5rem' },
         }}
         variant='outlined'
         sx={{ flex: 1, mb: 1 }}
       />
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <IconButton onClick={handleSpeechToText} color='primary'>
-          {isRecording ? <Stop /> : <Mic />}
+        <IconButton onClick={handleSpeechToText} color='primary' size='large'>
+          {isRecording ? (
+            <Stop sx={{ fontSize: 40 }} />
+          ) : (
+            <Mic sx={{ fontSize: 40 }} />
+          )}
         </IconButton>
-        <IconButton onClick={handleTextToSpeech} color='secondary'>
-          <VolumeUp />
+        <IconButton onClick={handleTextToSpeech} color='secondary' size='large'>
+          <VolumeUp sx={{ fontSize: 40 }} />
         </IconButton>
       </Box>
     </Box>

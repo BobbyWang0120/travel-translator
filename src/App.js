@@ -14,12 +14,7 @@ const theme = createTheme({
   components: {
     MuiCssBaseline: {
       styleOverrides: {
-        body: {
-          overflow: 'hidden',
-          position: 'fixed',
-          width: '100%',
-          height: '100%',
-        },
+        body: {},
       },
     },
   },
@@ -32,10 +27,9 @@ function App() {
       <TranslationProvider>
         <Box
           sx={{
-            height: '100vh',
+            minHeight: '80vh',
             display: 'flex',
             flexDirection: 'column',
-            overflow: 'hidden',
           }}
         >
           <Box
@@ -47,7 +41,9 @@ function App() {
             }}
           >
             <TranslationArea isSource={false} />
-            <LanguageSelector isSource={false} />
+            <Box sx={{ transform: 'rotate(180deg)' }}>
+              <LanguageSelector isSource={false} />
+            </Box>
           </Box>
           <Divider />
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
