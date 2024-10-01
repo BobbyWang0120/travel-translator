@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   ThemeProvider,
   createTheme,
@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import LanguageSelector from './components/LanguageSelector';
 import TranslationArea from './components/TranslationArea';
+import { TranslationProvider } from './context/TranslationContext';
 
 const theme = createTheme({
   components: {
@@ -25,45 +26,36 @@ const theme = createTheme({
 });
 
 function App() {
-  const [sourceLang, setSourceLang] = useState('zh');
-  const [targetLang, setTargetLang] = useState('en');
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box
-        sx={{
-          height: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-        }}
-      >
+      <TranslationProvider>
         <Box
           sx={{
-            flex: 1,
+            height: '100vh',
             display: 'flex',
-            flexDirection: 'column-reverse',
-            transform: 'rotate(180deg)',
+            flexDirection: 'column',
+            overflow: 'hidden',
           }}
         >
-          <TranslationArea
-            isSource={false}
-            sourceLang={sourceLang}
-            targetLang={targetLang}
-          />
-          <LanguageSelector value={targetLang} onChange={setTargetLang} />
+          <Box
+            sx={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column-reverse',
+              transform: 'rotate(180deg)',
+            }}
+          >
+            <TranslationArea isSource={false} />
+            <LanguageSelector isSource={false} />
+          </Box>
+          <Divider />
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <LanguageSelector isSource={true} />
+            <TranslationArea isSource={true} />
+          </Box>
         </Box>
-        <Divider />
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <LanguageSelector value={sourceLang} onChange={setSourceLang} />
-          <TranslationArea
-            isSource={true}
-            sourceLang={sourceLang}
-            targetLang={targetLang}
-          />
-        </Box>
-      </Box>
+      </TranslationProvider>
     </ThemeProvider>
   );
 }
