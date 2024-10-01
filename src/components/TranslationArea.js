@@ -14,14 +14,25 @@ function TranslationArea({ isSource }) {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const options = {};
+
+      // 检查浏览器是否支持 MediaRecorder 的 mimeType
+      if (MediaRecorder.isTypeSupported('audio/webm')) {
+        options.mimeType = 'audio/webm';
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        options.mimeType = 'audio/mp4';
+      }
+
       mediaRecorderRef.current = new MediaRecorder(stream);
       audioChunksRef.current = [];
 
       mediaRecorderRef.current.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
       };
 
-      mediaRecorderRef.current.start();
+      mediaRecorderRef.current.start(1000); // 每秒触发一次 dataavailable 事件
       setIsRecording(true);
     } catch (error) {
       console.error('Error accessing the microphone', error);
