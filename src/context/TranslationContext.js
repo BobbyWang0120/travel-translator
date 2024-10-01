@@ -1,5 +1,9 @@
 import React, { createContext, useState, useContext } from 'react';
-import { transcribeAudio, translateText } from '../services/openai';
+import {
+  transcribeAudio,
+  translateText,
+  textToSpeech,
+} from '../services/openai';
 
 const TranslationContext = createContext();
 
@@ -27,6 +31,12 @@ export const TranslationProvider = ({ children }) => {
         );
         // 设置翻译后的文本
         setTranslatedText(translated);
+        // 自动朗读翻译后的文本
+        const audioUrl = await textToSpeech(translated, targetLang);
+        if (audioUrl) {
+          const audio = new Audio(audioUrl);
+          audio.play();
+        }
       } else {
         // 如果是目标语言，设置翻译后的文本
         setTranslatedText(transcription);
@@ -38,10 +48,26 @@ export const TranslationProvider = ({ children }) => {
         );
         // 设置源文本
         setSourceText(translated);
+        // 自动朗读翻译后的文本
+        const audioUrl = await textToSpeech(translated, sourceLang);
+        if (audioUrl) {
+          const audio = new Audio(audioUrl);
+          audio.play();
+        }
       }
     } catch (error) {
       // 处理错误
       console.error('Error processing speech input:', error);
+    }
+  };
+
+  const playOppositeText = async (isSource) => {
+    const textToPlay = isSource ? translatedText : sourceText;
+    const langToUse = isSource ? targetLang : sourceLang;
+    const audioUrl = await textToSpeech(textToPlay, langToUse);
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play();
     }
   };
 
@@ -57,6 +83,7 @@ export const TranslationProvider = ({ children }) => {
         targetLang,
         setTargetLang,
         handleSpeechInput,
+        playOppositeText,
       }}
     >
       {children}

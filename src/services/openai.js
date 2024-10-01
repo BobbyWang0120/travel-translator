@@ -54,6 +54,27 @@ export const transcribeAudio = async (audioBlob) => {
 };
 
 export const textToSpeech = async (text, lang) => {
-  // 实现文本转语音
-  console.log('Text to speech not implemented');
+  try {
+    const response = await axios.post(
+      `${API_URL}/audio/speech`,
+      {
+        model: 'tts-1',
+        input: text,
+        voice: 'echo', // 使用不同的声音用于不同的语言
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        responseType: 'arraybuffer',
+      }
+    );
+
+    const audioBlob = new Blob([response.data], { type: 'audio/mp3' });
+    return URL.createObjectURL(audioBlob);
+  } catch (error) {
+    console.error('Text-to-speech error:', error);
+    return null;
+  }
 };

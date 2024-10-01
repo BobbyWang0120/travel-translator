@@ -5,7 +5,8 @@ import { useTranslation } from '../context/TranslationContext';
 import { textToSpeech } from '../services/openai';
 
 function TranslationArea({ isSource }) {
-  const { sourceText, translatedText, handleSpeechInput } = useTranslation();
+  const { sourceText, translatedText, handleSpeechInput, playOppositeText } =
+    useTranslation();
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -50,8 +51,7 @@ function TranslationArea({ isSource }) {
   };
 
   const handleTextToSpeech = () => {
-    const text = isSource ? sourceText : translatedText;
-    textToSpeech(text, isSource ? 'zh' : 'en');
+    playOppositeText(isSource);
   };
 
   return (
