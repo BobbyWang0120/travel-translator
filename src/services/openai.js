@@ -14,7 +14,7 @@ const openai = axios.create({
 export const translateText = async (text, sourceLang, targetLang) => {
   try {
     const response = await openai.post('/chat/completions', {
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-3.5-turbo-0125',
       messages: [
         {
           role: 'system',
@@ -30,14 +30,31 @@ export const translateText = async (text, sourceLang, targetLang) => {
   }
 };
 
-export const textToSpeech = async (text, lang) => {
-  // 实现文本转语音
-  // 注意：OpenAI 目前没有直接的文本转语音 API，这里需要使用其他服务
-  console.log('Text to speech not implemented');
+export const transcribeAudio = async (audioBlob) => {
+  const formData = new FormData();
+  formData.append('file', audioBlob, 'audio.mp3');
+  formData.append('model', 'whisper-1');
+  formData.append('language', 'zh');
+
+  try {
+    const response = await axios.post(
+      `${API_URL}/audio/transcriptions`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${API_KEY}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data.text;
+  } catch (error) {
+    console.error('Transcription error:', error);
+    return 'Transcription error occurred.';
+  }
 };
 
-export const speechToText = async (audioBlob, lang) => {
-  // 实现语音转文本
-  // 注意：这需要先将音频转换为适当的格式
-  console.log('Speech to text not implemented');
+export const textToSpeech = async (text, lang) => {
+  // 实现文本转语音
+  console.log('Text to speech not implemented');
 };
